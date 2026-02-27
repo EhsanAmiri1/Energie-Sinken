@@ -38,7 +38,7 @@ function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-          <Link href="/registrieren" className="btn-primary text-lg px-8 py-4">
+          <Link href="/analyse" className="btn-primary text-lg px-8 py-4">
             Jetzt kostenlos analysieren
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
@@ -258,7 +258,7 @@ function CTASection() {
           Laden Sie jetzt Ihre Jahresabrechnung hoch und erfahren Sie in wenigen 
           Minuten, wie viel Sie sparen können. Kostenlos und unverbindlich.
         </p>
-        <Link href="/registrieren" className="btn-primary mt-10 text-lg px-10 py-4">
+        <Link href="/analyse" className="btn-primary mt-10 text-lg px-10 py-4">
           Kostenlose Analyse starten
           <ArrowRight className="ml-2 h-5 w-5" />
         </Link>

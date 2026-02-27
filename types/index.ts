@@ -65,6 +65,24 @@ export interface Termin {
   created_at: string
 }
 
+// Analyse-Anfrage (ohne Login)
+export interface AnalyseAnfrage {
+  id: string
+  vorname: string
+  nachname: string
+  geburtsdatum?: string | null
+  email: string
+  telefon?: string | null
+  zaehler_nummer?: string | null
+  verbrauch_kwh?: number | null
+  marktlokations_id?: string | null
+  abrechnung_path?: string | null
+  abrechnung_filename?: string | null
+  status: 'neu' | 'in_bearbeitung' | 'abgeschlossen'
+  created_at: string
+  updated_at: string
+}
+
 export interface Lead {
   id: string
   user_id: string
