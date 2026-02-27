@@ -187,7 +187,7 @@ export async function sendAdminBenachrichtigung(data: {
   return sendEmail({
     to: [
       { email: 'ehsan.amiri.de1986@gmail.com', name: 'Ehsan Amiri' },
-      { email: 'Hakhakmoh@outlook.de', name: 'Mohammad Hakhak' },
+      { email: 'hakmoh@outlook.de', name: 'Mohammad Hakhak' },
     ],
     subject: `Neue Analyse-Anfrage von ${data.vorname} ${data.nachname}`,
     htmlContent: wrapInTemplate(content),
