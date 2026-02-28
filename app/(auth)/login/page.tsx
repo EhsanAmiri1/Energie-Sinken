@@ -8,6 +8,7 @@ import {
   ArrowRight, Eye, EyeOff,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-browser'
+import { ADMIN_EMAILS } from '@/lib/admin'
 
 type FormMode = 'form' | 'submitting' | 'error'
 
@@ -50,7 +51,8 @@ function LoginForm() {
 
       if (error) throw error
 
-      router.push(next)
+      const target = ADMIN_EMAILS.includes(email.toLowerCase()) ? '/admin' : next
+      router.push(target)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.'
       if (message.includes('Invalid login credentials')) {

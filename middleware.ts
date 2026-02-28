@@ -62,7 +62,8 @@ export async function middleware(request: NextRequest) {
   )
 
   if (isAuthPage && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    const isAdminUser = ADMIN_EMAILS.includes(user.email || '')
+    return NextResponse.redirect(new URL(isAdminUser ? '/admin' : '/dashboard', request.url))
   }
 
   return response
