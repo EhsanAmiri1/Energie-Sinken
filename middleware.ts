@@ -47,6 +47,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
+  // Admin-Seiten: Nur für Admin-Emails zugänglich
+  const ADMIN_EMAILS = ['ehsan.amiri.de1986@gmail.com', 'hakmoh@outlook.de']
+  const isAdminPage = request.nextUrl.pathname.startsWith('/admin')
+
+  if (isAdminPage && user && !ADMIN_EMAILS.includes(user.email || '')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
   // Eingeloggte User von Auth-Seiten weiterleiten
   const authPaths = ['/login', '/registrieren']
   const isAuthPage = authPaths.some((path) =>
