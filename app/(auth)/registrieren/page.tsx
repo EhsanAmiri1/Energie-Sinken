@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -12,6 +12,14 @@ import { createClient } from '@/lib/supabase-browser'
 type FormMode = 'form' | 'submitting' | 'success' | 'error'
 
 export default function RegistrierenPage() {
+  return (
+    <Suspense>
+      <RegistrierenForm />
+    </Suspense>
+  )
+}
+
+function RegistrierenForm() {
   const searchParams = useSearchParams()
   const prefillEmail = searchParams.get('email') || ''
 
