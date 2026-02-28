@@ -176,13 +176,20 @@ function RegistrierenForm() {
                         type="email"
                         required
                         defaultValue={prefillEmail}
+                        readOnly={!!prefillEmail}
                         placeholder="Ihre E-Mail-Adresse"
-                        className="block w-full rounded-xl border border-gray-300 py-3 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        className={`block w-full rounded-xl border py-3 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none ${
+                          prefillEmail
+                            ? 'border-brand-200 bg-brand-50/50 cursor-not-allowed'
+                            : 'border-gray-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20'
+                        }`}
                       />
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">
-                      Verwenden Sie die gleiche E-Mail wie bei der Analyse.
-                    </p>
+                    {prefillEmail && (
+                      <p className="mt-1 text-xs text-brand-600">
+                        Ihre E-Mail wurde automatisch ausgefüllt.
+                      </p>
+                    )}
                   </div>
 
                   {/* Passwort */}
