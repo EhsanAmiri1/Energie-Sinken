@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Eingeloggte User von Auth-Seiten weiterleiten
-  const authPaths = ['/login', '/registrieren']
+  const authPaths = ['/login', '/registrieren', '/passwort-vergessen']
   const isAuthPage = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   )

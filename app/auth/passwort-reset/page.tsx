@@ -1,34 +1,22 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Mail, Lock, LogIn,
-  ArrowRight, Eye, EyeOff,
+  Lock, KeyRound, Eye, EyeOff,
+  ArrowRight, CheckCircle2,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-browser'
-import { ADMIN_EMAILS } from '@/lib/admin'
 
-type FormMode = 'form' | 'submitting' | 'error'
+type FormMode = 'form' | 'submitting' | 'success' | 'error'
 
-export default function LoginPage() {
-  return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
-  )
-}
-
-function LoginForm() {
-  const searchParams = useSearchParams()
+export default function PasswortResetPage() {
   const router = useRouter()
-  const next = searchParams.get('next') || '/dashboard'
-  const callbackError = searchParams.get('error') || ''
-
   const [mode, setMode] = useState<FormMode>('form')
-  const [errorMsg, setErrorMsg] = useState(callbackError)
+  const [errorMsg, setErrorMsg] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -37,67 +25,97 @@ function LoginForm() {
 
     const form = e.currentTarget
     const formData = new FormData(form)
-
-    const email = formData.get('email') as string
     const passwort = formData.get('passwort') as string
+    const passwortConfirm = formData.get('passwort_confirm') as string
+
+    if (passwort.length < 8) {
+      setErrorMsg('Das Passwort muss mindestens 8 Zeichen lang sein.')
+      setMode('error')
+      return
+    }
+
+    if (passwort !== passwortConfirm) {
+      setErrorMsg('Die Passwörter stimmen nicht überein.')
+      setMode('error')
+      return
+    }
 
     try {
       const supabase = createClient()
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
+      const { error } = await supabase.auth.updateUser({
         password: passwort,
       })
 
       if (error) throw error
 
-      const target = ADMIN_EMAILS.includes(email.toLowerCase()) ? '/admin' : next
-      router.push(target)
+      setMode('success')
+      setTimeout(() => router.push('/login'), 3000)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.'
-      if (message.includes('Invalid login credentials')) {
-        setErrorMsg('E-Mail oder Passwort ist falsch.')
-      } else if (message.includes('Email not confirmed')) {
-        setErrorMsg('Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.')
-      } else {
-        setErrorMsg(message)
-      }
+      setErrorMsg(message)
       setMode('error')
     }
+  }
+
+  if (mode === 'success') {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen bg-gray-50 pt-20">
+          <div className="container-tight py-24">
+            <div className="mx-auto max-w-lg text-center">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-brand-100">
+                <CheckCircle2 className="h-10 w-10 text-brand-500" />
+              </div>
+              <h1 className="mt-6 text-3xl font-bold text-gray-900">
+                Passwort geändert!
+              </h1>
+              <p className="mt-4 text-lg text-gray-600 leading-relaxed">
+                Ihr Passwort wurde erfolgreich geändert.
+                Sie werden automatisch zum Login weitergeleitet...
+              </p>
+              <div className="mt-8">
+                <Link href="/login" className="btn-primary">
+                  Zum Login
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </main>
+      </>
+    )
   }
 
   return (
     <>
       <Header />
       <main className="min-h-screen bg-gray-50 pt-20">
-        {/* Hero-Bereich */}
         <section className="bg-energy-dark py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-brand-950/80 via-energy-dark to-energy-dark" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-brand-500/10 blur-3xl" />
           <div className="container-tight relative z-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm text-brand-300">
-              <LogIn className="h-4 w-4" />
-              Willkommen zurück
+              <KeyRound className="h-4 w-4" />
+              Neues Passwort festlegen
             </div>
             <h1 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-              In Ihrem{' '}
+              Neues{' '}
               <span className="bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent">
-                Konto anmelden
+                Passwort
               </span>
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300">
-              Melden Sie sich an, um Ihre Energiekosten-Analyse
-              und Ihr persönliches Dashboard einzusehen.
+              Geben Sie Ihr neues Passwort ein.
             </p>
           </div>
         </section>
 
-        {/* Formular */}
         <section className="py-16">
           <div className="container-tight">
             <form onSubmit={handleSubmit} className="mx-auto max-w-md">
-              {/* Fehlermeldung */}
-              {(mode === 'error' || callbackError) && errorMsg && (
+              {mode === 'error' && (
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                   {errorMsg}
                 </div>
@@ -106,32 +124,13 @@ function LoginForm() {
               <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
                 <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">
                   <Lock className="h-5 w-5 text-brand-500" />
-                  Anmelden
+                  Neues Passwort
                 </h2>
 
                 <div className="mt-6 grid gap-4">
-                  {/* E-Mail */}
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      E-Mail <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative mt-1">
-                      <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="Ihre E-Mail-Adresse"
-                        className="block w-full rounded-xl border border-gray-300 py-3 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Passwort */}
                   <div>
                     <label htmlFor="passwort" className="block text-sm font-medium text-gray-700">
-                      Passwort <span className="text-red-500">*</span>
+                      Neues Passwort <span className="text-red-500">*</span>
                     </label>
                     <div className="relative mt-1">
                       <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -140,7 +139,8 @@ function LoginForm() {
                         name="passwort"
                         type={showPassword ? 'text' : 'password'}
                         required
-                        placeholder="Ihr Passwort"
+                        minLength={8}
+                        placeholder="Mindestens 8 Zeichen"
                         className="block w-full rounded-xl border border-gray-300 py-3 pl-10 pr-12 text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       />
                       <button
@@ -149,6 +149,32 @@ function LoginForm() {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Mindestens 8 Zeichen</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="passwort_confirm" className="block text-sm font-medium text-gray-700">
+                      Passwort bestätigen <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative mt-1">
+                      <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                      <input
+                        id="passwort_confirm"
+                        name="passwort_confirm"
+                        type={showConfirm ? 'text' : 'password'}
+                        required
+                        minLength={8}
+                        placeholder="Passwort wiederholen"
+                        className="block w-full rounded-xl border border-gray-300 py-3 pl-10 pr-12 text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirm(!showConfirm)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
@@ -165,29 +191,15 @@ function LoginForm() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      Wird angemeldet...
+                      Wird gespeichert...
                     </>
                   ) : (
                     <>
-                      Anmelden
+                      Passwort ändern
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </>
                   )}
                 </button>
-
-                <div className="mt-4 space-y-2 text-center text-sm text-gray-500">
-                  <p>
-                    <Link href="/passwort-vergessen" className="text-brand-600 font-medium hover:text-brand-700">
-                      Passwort vergessen?
-                    </Link>
-                  </p>
-                  <p>
-                    Noch kein Konto?{' '}
-                    <Link href="/registrieren" className="text-brand-600 font-medium hover:text-brand-700">
-                      Jetzt registrieren
-                    </Link>
-                  </p>
-                </div>
               </div>
             </form>
           </div>
@@ -197,7 +209,6 @@ function LoginForm() {
   )
 }
 
-// Header
 function Header() {
   return (
     <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-energy-dark/80 backdrop-blur-lg">
@@ -209,8 +220,8 @@ function Header() {
           <Link href="/" className="text-sm text-gray-300 hover:text-white transition-colors">
             Startseite
           </Link>
-          <Link href="/registrieren" className="text-sm text-gray-300 hover:text-white transition-colors">
-            Registrieren
+          <Link href="/login" className="text-sm text-gray-300 hover:text-white transition-colors">
+            Login
           </Link>
         </nav>
       </div>
