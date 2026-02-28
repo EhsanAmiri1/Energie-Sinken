@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, User, Mail, Phone, Calendar,
-  Hash, Zap, MapPin, FileText, ClipboardList,
+  Hash, Zap, MapPin, FileText, ClipboardList, Download,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
@@ -37,7 +37,6 @@ export default async function AnfrageDetailPage({
     { icon: Hash, label: 'Zählernummer', value: anfrage.zaehler_nummer || '—' },
     { icon: Zap, label: 'Verbrauch', value: anfrage.verbrauch_kwh ? `${Number(anfrage.verbrauch_kwh).toLocaleString('de-DE')} kWh` : '—' },
     { icon: MapPin, label: 'Marktlokations-ID', value: anfrage.marktlokations_id || '—' },
-    { icon: FileText, label: 'Abrechnung', value: anfrage.abrechnung_filename || 'Keine Datei' },
   ]
 
   return (
@@ -87,6 +86,25 @@ export default async function AnfrageDetailPage({
                       <span className="text-sm text-gray-900">{value}</span>
                     </div>
                   ))}
+
+                  {/* Abrechnung mit Download-Link */}
+                  <div className="flex items-center gap-3 py-3">
+                    <FileText className="h-4 w-4 shrink-0 text-gray-400" />
+                    <span className="w-40 shrink-0 text-sm font-medium text-gray-500">Abrechnung</span>
+                    {anfrage.abrechnung_path ? (
+                      <a
+                        href={`/api/admin/anfrage/${anfrage.id}/datei`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors"
+                      >
+                        <Download className="h-4 w-4" />
+                        {anfrage.abrechnung_filename || 'Datei öffnen'}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-400">Keine Datei hochgeladen</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
