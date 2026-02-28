@@ -31,7 +31,7 @@ export default async function DashboardPage() {
     .limit(1)
     .single<AnalyseAnfrage>()
 
-  const vorname = profile?.vorname || 'Kunde'
+  const vorname = profile?.vorname || analyse?.vorname || 'Kunde'
 
   return (
     <>
@@ -143,39 +143,49 @@ function AnalyseStatusCard({ analyse }: { analyse: AnalyseAnfrage | null }) {
         </span>
       </div>
 
-      {/* Fortschrittsanzeige */}
+      {/* Fortschrittsbalken */}
       <div className="mt-8">
-        <div className="flex items-center justify-between">
-          {steps.map((step, i) => {
-            const StepIcon = step.icon
+        {/* Progress Bar */}
+        <div className="relative h-2 rounded-full bg-gray-200">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-brand-500 transition-all duration-500"
+            style={{ width: currentStep === 1 ? '16.5%' : currentStep === 2 ? '50%' : '100%' }}
+          />
+          {/* Punkte auf der Leiste */}
+          {steps.map((_, i) => {
             const isActive = i + 1 <= currentStep
-            const isCurrent = i + 1 === currentStep
             return (
-              <div key={step.label} className="flex flex-1 flex-col items-center text-center">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+              <div
+                key={i}
+                className={`absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 transition-colors ${
                   isActive
-                    ? isCurrent
-                      ? 'bg-brand-500 text-white ring-4 ring-brand-100'
-                      : 'bg-brand-500 text-white'
-                    : 'bg-gray-100 text-gray-400'
-                }`}>
-                  <StepIcon className="h-5 w-5" />
-                </div>
-                <span className={`mt-2 text-xs font-medium sm:text-sm ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>
-                  {step.label}
-                </span>
-              </div>
+                    ? 'border-brand-500 bg-brand-500'
+                    : 'border-gray-300 bg-white'
+                }`}
+                style={{ left: i === 0 ? '0%' : i === 1 ? '50%' : '100%', transform: `translate(-50%, -50%)` }}
+              />
             )
           })}
         </div>
-        {/* Verbindungslinien */}
-        <div className="relative mx-auto mt-[-36px] mb-6 flex items-center px-[20%]" aria-hidden>
-          <div className={`h-0.5 flex-1 ${currentStep >= 2 ? 'bg-brand-500' : 'bg-gray-200'}`} />
-          <div className={`h-0.5 flex-1 ${currentStep >= 3 ? 'bg-brand-500' : 'bg-gray-200'}`} />
+        {/* Labels unter der Leiste */}
+        <div className="mt-3 flex justify-between">
+          {steps.map((step, i) => {
+            const isActive = i + 1 <= currentStep
+            return (
+              <span
+                key={step.label}
+                className={`text-xs font-medium sm:text-sm ${isActive ? 'text-brand-600' : 'text-gray-400'} ${
+                  i === 0 ? 'text-left' : i === 1 ? 'text-center' : 'text-right'
+                }`}
+              >
+                {step.label}
+              </span>
+            )
+          })}
         </div>
       </div>
 
-      <p className="text-sm text-gray-500">
+      <p className="mt-8 text-sm text-gray-500">
         Eingereicht am{' '}
         {new Date(analyse.created_at).toLocaleDateString('de-DE', {
           day: '2-digit',
@@ -230,10 +240,19 @@ function NaechsteSchritteCard({ status }: { status?: string }) {
 // ───────── Ihre Daten ─────────
 
 function DatenCard({ profile, analyse }: { profile: Profile | null; analyse: AnalyseAnfrage | null }) {
+  // Fallback: Wenn kein Profil existiert, Daten aus analyse_anfragen nehmen
+  const name = profile
+    ? `${profile.vorname} ${profile.nachname}`.trim()
+    : analyse
+      ? `${analyse.vorname} ${analyse.nachname}`.trim()
+      : '—'
+  const email = profile?.email || analyse?.email || '—'
+  const telefon = profile?.telefon || analyse?.telefon || '—'
+
   const rows = [
-    { icon: User, label: 'Name', value: profile ? `${profile.vorname} ${profile.nachname}` : '—' },
-    { icon: Mail, label: 'E-Mail', value: profile?.email || '—' },
-    { icon: Phone, label: 'Telefon', value: profile?.telefon || '—' },
+    { icon: User, label: 'Name', value: name || '—' },
+    { icon: Mail, label: 'E-Mail', value: email },
+    { icon: Phone, label: 'Telefon', value: telefon },
     { icon: Hash, label: 'Zählernummer', value: analyse?.zaehler_nummer || '—' },
     { icon: Zap, label: 'Jahresverbrauch', value: analyse?.verbrauch_kwh ? `${Number(analyse.verbrauch_kwh).toLocaleString('de-DE')} kWh` : '—' },
     { icon: MapPin, label: 'Marktlokations-ID', value: analyse?.marktlokations_id || '—' },
