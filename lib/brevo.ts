@@ -109,7 +109,7 @@ export async function sendKundenBestaetigung(nachname: string, email: string) {
     <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 24px;">
       <tr>
         <td style="background-color:#22a366;border-radius:12px;">
-          <a href="${appUrl}/registrieren"
+          <a href="${appUrl}/registrieren?email=${encodeURIComponent(email)}"
              style="display:inline-block;padding:16px 32px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;">
             Ersparnis ansehen &rarr;
           </a>
