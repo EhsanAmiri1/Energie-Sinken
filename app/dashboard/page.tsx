@@ -118,13 +118,15 @@ function AnfragenListe({ anfragen }: { anfragen: AnalyseAnfrage[] }) {
 const statusConfig = {
   neu: { label: 'Eingereicht', color: 'text-brand-600', bg: 'bg-brand-50', border: 'border-brand-200', step: 1 },
   in_bearbeitung: { label: 'In Bearbeitung', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', step: 2 },
-  abgeschlossen: { label: 'Abgeschlossen', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', step: 3 },
+  angebot_geschickt: { label: 'Angebot geschickt', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', step: 3 },
+  abgeschlossen: { label: 'Abgeschlossen', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', step: 4 },
 } as const
 
 const steps = [
   { label: 'Eingereicht' },
   { label: 'In Bearbeitung' },
-  { label: 'Ergebnis' },
+  { label: 'Angebot geschickt' },
+  { label: 'Abgeschlossen' },
 ]
 
 function AnfrageCard({ anfrage }: { anfrage: AnalyseAnfrage }) {
@@ -158,7 +160,7 @@ function AnfrageCard({ anfrage }: { anfrage: AnalyseAnfrage }) {
         <div className="relative h-1.5 rounded-full bg-gray-200">
           <div
             className="absolute inset-y-0 left-0 rounded-full bg-brand-500 transition-all duration-500"
-            style={{ width: currentStep === 1 ? '16.5%' : currentStep === 2 ? '50%' : '100%' }}
+            style={{ width: currentStep === 1 ? '11%' : currentStep === 2 ? '37%' : currentStep === 3 ? '67%' : '100%' }}
           />
           {steps.map((_, i) => {
             const isActive = i + 1 <= currentStep
@@ -168,7 +170,7 @@ function AnfrageCard({ anfrage }: { anfrage: AnalyseAnfrage }) {
                 className={`absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 transition-colors ${
                   isActive ? 'border-brand-500 bg-brand-500' : 'border-gray-300 bg-white'
                 }`}
-                style={{ left: i === 0 ? '0%' : i === 1 ? '50%' : '100%', transform: 'translate(-50%, -50%)' }}
+                style={{ left: i === 0 ? '0%' : i === 1 ? '33.3%' : i === 2 ? '66.6%' : '100%', transform: 'translate(-50%, -50%)' }}
               />
             )
           })}
@@ -251,6 +253,7 @@ function AnfrageCard({ anfrage }: { anfrage: AnalyseAnfrage }) {
 function InfoCard({ anfragen }: { anfragen: AnalyseAnfrage[] }) {
   const neu = anfragen.filter((a) => a.status === 'neu').length
   const inBearbeitung = anfragen.filter((a) => a.status === 'in_bearbeitung').length
+  const angebotGeschickt = anfragen.filter((a) => a.status === 'angebot_geschickt').length
   const abgeschlossen = anfragen.filter((a) => a.status === 'abgeschlossen').length
 
   if (anfragen.length === 0) {
@@ -285,6 +288,12 @@ function InfoCard({ anfragen }: { anfragen: AnalyseAnfrage[] }) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">In Bearbeitung</span>
             <span className="font-medium text-amber-600">{inBearbeitung}</span>
+          </div>
+        )}
+        {angebotGeschickt > 0 && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">Angebot geschickt</span>
+            <span className="font-medium text-blue-600">{angebotGeschickt}</span>
           </div>
         )}
         {abgeschlossen > 0 && (

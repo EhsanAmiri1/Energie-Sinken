@@ -83,7 +83,7 @@ export interface AnalyseAnfrage {
   ergebnis_path?: string | null
   ergebnis_filename?: string | null
   ersparnis_euro?: number | null
-  status: 'neu' | 'in_bearbeitung' | 'abgeschlossen'
+  status: 'neu' | 'in_bearbeitung' | 'angebot_geschickt' | 'abgeschlossen'
   created_at: string
   updated_at: string
 }

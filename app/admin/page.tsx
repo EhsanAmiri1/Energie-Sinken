@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   ClipboardList, Users, Clock, CheckCircle2,
-  AlertCircle, ArrowRight, Zap, Flame,
+  AlertCircle, ArrowRight, Zap, Flame, Send,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
@@ -23,12 +23,14 @@ export default async function AdminPage() {
   const alle = (anfragen as AnalyseAnfrage[]) || []
   const neu = alle.filter((a) => a.status === 'neu')
   const inBearbeitung = alle.filter((a) => a.status === 'in_bearbeitung')
+  const angebotGeschickt = alle.filter((a) => a.status === 'angebot_geschickt')
   const abgeschlossen = alle.filter((a) => a.status === 'abgeschlossen')
 
   const stats = [
     { label: 'Gesamt', value: alle.length, icon: Users, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-200' },
     { label: 'Neu', value: neu.length, icon: AlertCircle, color: 'text-brand-600', bg: 'bg-brand-50', border: 'border-brand-200' },
     { label: 'In Bearbeitung', value: inBearbeitung.length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
+    { label: 'Angebot geschickt', value: angebotGeschickt.length, icon: Send, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     { label: 'Abgeschlossen', value: abgeschlossen.length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
   ]
 
@@ -56,7 +58,7 @@ export default async function AdminPage() {
         <section className="py-8">
           <div className="container-tight">
             {/* Statistik */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
               {stats.map((s) => (
                 <div key={s.label} className={`rounded-2xl border ${s.border} ${s.bg} p-5`}>
                   <div className="flex items-center gap-2">
@@ -153,6 +155,7 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; color: string; bg: string; border: string }> = {
     neu: { label: 'Neu', color: 'text-brand-600', bg: 'bg-brand-50', border: 'border-brand-200' },
     in_bearbeitung: { label: 'In Bearbeitung', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
+    angebot_geschickt: { label: 'Angebot geschickt', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
     abgeschlossen: { label: 'Abgeschlossen', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
   }
   const c = config[status] || config.neu

@@ -7,6 +7,7 @@ import { Save, CheckCircle2 } from 'lucide-react'
 const statusOptions = [
   { value: 'neu', label: 'Neu' },
   { value: 'in_bearbeitung', label: 'In Bearbeitung' },
+  { value: 'angebot_geschickt', label: 'Angebot geschickt' },
   { value: 'abgeschlossen', label: 'Abgeschlossen' },
 ]
 

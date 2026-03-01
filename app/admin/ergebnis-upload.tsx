@@ -35,9 +35,16 @@ export default function ErgebnisUpload({
         body: formData,
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
         throw new Error(data.error || 'Ein Fehler ist aufgetreten.')
+      }
+
+      if (data.emailError) {
+        setErrorMsg(`Datei gespeichert, aber E-Mail fehlgeschlagen: ${data.emailError}`)
+        setMode('error')
+        return
       }
 
       setMode('success')

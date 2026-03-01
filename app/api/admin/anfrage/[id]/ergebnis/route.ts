@@ -63,7 +63,7 @@ export async function POST(
         ergebnis_path: storagePath,
         ergebnis_filename: datei.name,
         ersparnis_euro: parseFloat(ersparnis),
-        status: 'abgeschlossen',
+        status: 'angebot_geschickt',
         updated_at: new Date().toISOString(),
       })
       .eq('id', params.id)
@@ -73,20 +73,24 @@ export async function POST(
       return NextResponse.json({ error: 'Daten konnten nicht gespeichert werden.' }, { status: 500 })
     }
 
-    // E-Mail an Kunden senden (nicht blockierend)
+    // E-Mail an Kunden senden
     const ergebnisBase64 = fileBuffer.toString('base64')
-    sendErgebnisEmail({
-      vorname: anfrage.vorname,
-      nachname: anfrage.nachname,
-      email: anfrage.email,
-      ersparnis_euro: ersparnis,
-      ergebnis_filename: datei.name,
-      ergebnisBase64,
-    }).catch((err) => {
+    let emailError: string | null = null
+    try {
+      await sendErgebnisEmail({
+        vorname: anfrage.vorname,
+        nachname: anfrage.nachname,
+        email: anfrage.email,
+        ersparnis_euro: ersparnis,
+        ergebnis_filename: datei.name,
+        ergebnisBase64,
+      })
+    } catch (err) {
+      emailError = err instanceof Error ? err.message : String(err)
       console.error('Ergebnis-E-Mail Fehler:', err)
-    })
+    }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, emailError })
   } catch (error) {
     console.error('Ergebnis Upload Fehler:', error)
     return NextResponse.json({ error: 'Ein unerwarteter Fehler ist aufgetreten.' }, { status: 500 })
