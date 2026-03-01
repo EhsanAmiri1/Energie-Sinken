@@ -1,15 +1,13 @@
-import { redirect, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, User, Mail, Phone, Calendar,
   Hash, Zap, MapPin, FileText, ClipboardList, Download, Flame, Building2,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
-import { isAdmin } from '@/lib/admin'
 import type { AnalyseAnfrage } from '@/types'
 import StatusUpdate from '../../status-update'
 import ErgebnisUpload from '../../ergebnis-upload'
-import LogoutButton from '@/app/dashboard/logout-button'
 
 export default async function AnfrageDetailPage({
   params,
@@ -17,9 +15,6 @@ export default async function AnfrageDetailPage({
   params: { id: string }
 }) {
   const supabase = createServerSupabaseClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !isAdmin(user.email)) redirect('/dashboard')
 
   const { data: anfrage } = await supabase
     .from('analyse_anfragen')
@@ -43,109 +38,81 @@ export default async function AnfrageDetailPage({
   ]
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 pt-20">
-        <section className="bg-energy-dark py-10 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-950/80 via-energy-dark to-energy-dark" />
-          <div className="container-tight relative z-10">
-            <Link
-              href="/admin"
-              className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors mb-4"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Zurück zur Übersicht
-            </Link>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">
-              {anfrage.vorname}{' '}
-              <span className="bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent">
-                {anfrage.nachname}
-              </span>
-            </h1>
-            <p className="mt-1 text-gray-300">
-              Eingereicht am {new Date(anfrage.created_at).toLocaleDateString('de-DE', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-        </section>
+    <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
+      {/* Header */}
+      <div className="mb-6">
+        <Link
+          href="/admin/leads"
+          className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors mb-4"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Zurück zu Leads
+        </Link>
+        <h1 className="text-2xl font-bold text-white">
+          {anfrage.vorname}{' '}
+          <span className="text-brand-400">{anfrage.nachname}</span>
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          Eingereicht am {new Date(anfrage.created_at).toLocaleDateString('de-DE', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </p>
+      </div>
 
-        <section className="py-8">
-          <div className="container-tight grid gap-6 lg:grid-cols-3">
-            {/* Kundendaten */}
-            <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
-                <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">
-                  <ClipboardList className="h-5 w-5 text-brand-500" />
-                  Kundendaten
-                </h2>
-                <div className="mt-6 divide-y divide-gray-100">
-                  {rows.map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex items-center gap-3 py-3">
-                      <Icon className="h-4 w-4 shrink-0 text-gray-400" />
-                      <span className="w-40 shrink-0 text-sm font-medium text-gray-500">{label}</span>
-                      <span className="text-sm text-gray-900">{value}</span>
-                    </div>
-                  ))}
-
-                  {/* Abrechnung mit Download-Link */}
-                  <div className="flex items-center gap-3 py-3">
-                    <FileText className="h-4 w-4 shrink-0 text-gray-400" />
-                    <span className="w-40 shrink-0 text-sm font-medium text-gray-500">Abrechnung</span>
-                    {anfrage.abrechnung_path ? (
-                      <a
-                        href={`/api/admin/anfrage/${anfrage.id}/datei`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors"
-                      >
-                        <Download className="h-4 w-4" />
-                        {anfrage.abrechnung_filename || 'Datei öffnen'}
-                      </a>
-                    ) : (
-                      <span className="text-sm text-gray-400">Keine Datei hochgeladen</span>
-                    )}
-                  </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Kundendaten */}
+        <div className="lg:col-span-2">
+          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-white">
+              <ClipboardList className="h-5 w-5 text-brand-400" />
+              Kundendaten
+            </h2>
+            <div className="mt-6 divide-y divide-gray-800/50">
+              {rows.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-3 py-3">
+                  <Icon className="h-4 w-4 shrink-0 text-gray-500" />
+                  <span className="w-40 shrink-0 text-sm font-medium text-gray-400">{label}</span>
+                  <span className="text-sm text-gray-200">{value}</span>
                 </div>
+              ))}
+
+              {/* Abrechnung mit Download-Link */}
+              <div className="flex items-center gap-3 py-3">
+                <FileText className="h-4 w-4 shrink-0 text-gray-500" />
+                <span className="w-40 shrink-0 text-sm font-medium text-gray-400">Abrechnung</span>
+                {anfrage.abrechnung_path ? (
+                  <a
+                    href={`/api/admin/anfrage/${anfrage.id}/datei`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-brand-500/10 border border-brand-500/20 px-3 py-1.5 text-sm font-medium text-brand-400 hover:bg-brand-500/20 transition-colors"
+                  >
+                    <Download className="h-4 w-4" />
+                    {anfrage.abrechnung_filename || 'Datei öffnen'}
+                  </a>
+                ) : (
+                  <span className="text-sm text-gray-500">Keine Datei hochgeladen</span>
+                )}
               </div>
             </div>
-
-            {/* Status & Ergebnis */}
-            <div className="lg:col-span-1 space-y-6">
-              <StatusUpdate
-                id={anfrage.id}
-                currentStatus={anfrage.status}
-              />
-              <ErgebnisUpload
-                id={anfrage.id}
-                ergebnis_filename={anfrage.ergebnis_filename}
-                ersparnis_euro={anfrage.ersparnis_euro}
-              />
-            </div>
           </div>
-        </section>
-      </main>
-    </>
-  )
-}
+        </div>
 
-function Header() {
-  return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-energy-dark/80 backdrop-blur-lg">
-      <div className="container-tight flex h-16 items-center justify-between">
-        <Link href="/admin" className="text-lg font-bold text-white">
-          <span className="text-brand-400">Energiekosten</span> Sinken
-          <span className="ml-2 rounded bg-brand-500/20 px-2 py-0.5 text-xs text-brand-300">Admin</span>
-        </Link>
-        <nav className="flex items-center gap-4">
-          <Link href="/admin" className="text-sm text-gray-300 hover:text-white transition-colors">
-            Übersicht
-          </Link>
-          <LogoutButton />
-        </nav>
+        {/* Status & Ergebnis */}
+        <div className="lg:col-span-1 space-y-6">
+          <StatusUpdate
+            id={anfrage.id}
+            currentStatus={anfrage.status}
+          />
+          <ErgebnisUpload
+            id={anfrage.id}
+            ergebnis_filename={anfrage.ergebnis_filename}
+            ersparnis_euro={anfrage.ersparnis_euro}
+          />
+        </div>
       </div>
-    </header>
+    </div>
   )
 }

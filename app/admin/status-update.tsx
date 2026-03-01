@@ -47,18 +47,18 @@ export default function StatusUpdate({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
-      <h2 className="text-lg font-bold text-gray-900">Status ändern</h2>
+    <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+      <h2 className="text-lg font-semibold text-white">Status ändern</h2>
 
       <div className="mt-4">
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="status" className="block text-sm font-medium text-gray-400">
           Aktueller Status
         </label>
         <select
           id="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="mt-1 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="mt-1 block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-200 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -71,11 +71,11 @@ export default function StatusUpdate({
       <button
         onClick={handleSave}
         disabled={saving || status === currentStatus}
-        className="btn-primary mt-6 w-full"
+        className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {saving ? (
           <>
-            <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -83,12 +83,12 @@ export default function StatusUpdate({
           </>
         ) : saved ? (
           <>
-            <CheckCircle2 className="mr-2 h-4 w-4" />
+            <CheckCircle2 className="h-4 w-4" />
             Gespeichert
           </>
         ) : (
           <>
-            <Save className="mr-2 h-4 w-4" />
+            <Save className="h-4 w-4" />
             Speichern
           </>
         )}

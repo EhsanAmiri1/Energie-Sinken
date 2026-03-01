@@ -68,19 +68,19 @@ export default function ErgebnisUpload({
   // Bereits hochgeladenes Ergebnis anzeigen
   if (gespeichert && mode !== 'error') {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-6 shadow-sm">
-        <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
+      <div className="rounded-xl border border-green-500/20 bg-green-500/10 p-6">
+        <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+          <CheckCircle2 className="h-5 w-5 text-green-400" />
           Ergebnis gesendet
         </h3>
         <div className="mt-4 space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <FileText className="h-4 w-4 text-green-600" />
+          <div className="flex items-center gap-2 text-sm text-gray-300">
+            <FileText className="h-4 w-4 text-green-400" />
             <span className="font-medium">{ergebnis_filename || fileName}</span>
           </div>
           {(ersparnis_euro || mode === 'success') && (
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <Euro className="h-4 w-4 text-green-600" />
+            <div className="flex items-center gap-2 text-sm text-gray-300">
+              <Euro className="h-4 w-4 text-green-400" />
               <span className="font-medium">
                 {ersparnis_euro
                   ? `${Number(ersparnis_euro).toLocaleString('de-DE', { minimumFractionDigits: 2 })} € / Jahr`
@@ -90,7 +90,7 @@ export default function ErgebnisUpload({
             </div>
           )}
           {mode === 'success' && (
-            <p className="text-xs text-green-700 mt-2">
+            <p className="text-xs text-green-400/80 mt-2">
               E-Mail mit Ergebnis wurde an den Kunden gesendet.
             </p>
           )}
@@ -100,9 +100,9 @@ export default function ErgebnisUpload({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
-        <Send className="h-5 w-5 text-brand-500" />
+    <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-6">
+      <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+        <Send className="h-5 w-5 text-brand-400" />
         Ergebnis hochladen
       </h3>
       <p className="mt-1 text-xs text-gray-500">
@@ -110,7 +110,7 @@ export default function ErgebnisUpload({
       </p>
 
       {mode === 'error' && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+        <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400">
           {errorMsg}
         </div>
       )}
@@ -118,21 +118,21 @@ export default function ErgebnisUpload({
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         {/* Datei-Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Ergebnis-Datei <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-gray-400 mb-1">
+            Ergebnis-Datei <span className="text-red-400">*</span>
           </label>
           {fileName ? (
-            <div className="flex items-center justify-between rounded-lg border border-brand-200 bg-brand-50 p-3">
+            <div className="flex items-center justify-between rounded-lg border border-brand-500/20 bg-brand-500/10 p-3">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-brand-600" />
-                <span className="text-xs font-medium text-brand-800 truncate max-w-[150px]">
+                <FileText className="h-4 w-4 text-brand-400" />
+                <span className="text-xs font-medium text-brand-300 truncate max-w-[150px]">
                   {fileName}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={clearFile}
-                className="rounded p-0.5 text-brand-600 hover:bg-brand-100"
+                className="rounded p-0.5 text-brand-400 hover:text-brand-300"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -140,10 +140,10 @@ export default function ErgebnisUpload({
           ) : (
             <label
               htmlFor={`ergebnis-${id}`}
-              className="flex cursor-pointer flex-col items-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-4 transition-colors hover:border-brand-400 hover:bg-brand-50/50"
+              className="flex cursor-pointer flex-col items-center rounded-lg border-2 border-dashed border-gray-700 bg-gray-800/50 p-4 transition-colors hover:border-brand-500/50 hover:bg-brand-500/5"
             >
-              <Upload className="h-6 w-6 text-gray-400" />
-              <span className="mt-1 text-xs font-medium text-gray-600">PDF oder JPG</span>
+              <Upload className="h-6 w-6 text-gray-500" />
+              <span className="mt-1 text-xs font-medium text-gray-400">PDF oder JPG</span>
             </label>
           )}
           <input
@@ -160,11 +160,11 @@ export default function ErgebnisUpload({
 
         {/* Ersparnis-Betrag */}
         <div>
-          <label htmlFor={`ersparnis-${id}`} className="block text-sm font-medium text-gray-700 mb-1">
-            Ersparnis (€ / Jahr) <span className="text-red-500">*</span>
+          <label htmlFor={`ersparnis-${id}`} className="block text-sm font-medium text-gray-400 mb-1">
+            Ersparnis (€ / Jahr) <span className="text-red-400">*</span>
           </label>
           <div className="relative">
-            <Euro className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Euro className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
             <input
               id={`ersparnis-${id}`}
               name="ersparnis_euro"
@@ -173,7 +173,7 @@ export default function ErgebnisUpload({
               min="0"
               required
               placeholder="z.B. 450.00"
-              className="block w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              className="block w-full rounded-lg border border-gray-700 bg-gray-800 py-2.5 pl-10 pr-4 text-sm text-gray-200 placeholder:text-gray-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
         </div>
@@ -182,11 +182,11 @@ export default function ErgebnisUpload({
         <button
           type="submit"
           disabled={mode === 'uploading'}
-          className="btn-primary w-full py-3 text-sm"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-3 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {mode === 'uploading' ? (
             <>
-              <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
@@ -194,7 +194,7 @@ export default function ErgebnisUpload({
             </>
           ) : (
             <>
-              <Send className="mr-1.5 h-4 w-4" />
+              <Send className="h-4 w-4" />
               Ergebnis senden
             </>
           )}
