@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { 
+import {
   Zap, Flame, TrendingDown, Upload, Calendar, ShieldCheck,
   ArrowRight, CheckCircle2, Building2, Home, Phone, Mail
 } from 'lucide-react'
+import VideoSection from './video-section'
 
 // ===== Hero Section =====
 function HeroSection() {
@@ -32,8 +33,8 @@ function HeroSection() {
         </h1>
 
         <p className="mt-6 max-w-2xl text-lg text-gray-300 leading-relaxed">
-          Ob Haushalt oder Unternehmen — wir analysieren Ihre Strom- und Gaskosten 
-          und finden den optimalen Tarif für Sie. Einfach Abrechnung hochladen, 
+          Ob Haushalt oder Unternehmen — wir analysieren Ihre Strom- und Gaskosten
+          und finden den optimalen Tarif für Sie. Einfach Abrechnung hochladen,
           Termin buchen, sparen.
         </p>
 
@@ -362,6 +363,14 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroSection />
+        {/* Video-Sektion */}
+        <section className="py-16 bg-gray-50">
+          <div className="container-tight">
+            <div className="mx-auto max-w-4xl">
+              <VideoSection />
+            </div>
+          </div>
+        </section>
         <ProcessSection />
         <AudienceSection />
         <EnergyTypeSection />
