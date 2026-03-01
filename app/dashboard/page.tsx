@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {
   User, Mail, Phone, Zap, Hash, MapPin,
   FileText, Clock, CheckCircle2, ArrowRight,
-  ClipboardList, Plus, Flame,
+  ClipboardList, Plus, Flame, Download, Euro,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import type { Profile, AnalyseAnfrage } from '@/types'
@@ -211,6 +211,31 @@ function AnfrageCard({ anfrage }: { anfrage: AnalyseAnfrage }) {
           </span>
         )}
       </div>
+
+      {/* Ergebnis-Bereich */}
+      {anfrage.ergebnis_path && (
+        <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              {anfrage.ersparnis_euro && (
+                <p className="flex items-center gap-1.5 text-sm font-bold text-green-700">
+                  <Euro className="h-4 w-4" />
+                  Sie sparen {Number(anfrage.ersparnis_euro).toLocaleString('de-DE', { minimumFractionDigits: 2 })} € / Jahr
+                </p>
+              )}
+            </div>
+            <a
+              href={`/api/admin/anfrage/${anfrage.id}/ergebnis-datei`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Ergebnis herunterladen
+            </a>
+          </div>
+        </div>
+      )}
 
       <p className="mt-3 text-xs text-gray-400">
         Eingereicht am {new Date(anfrage.created_at).toLocaleDateString('de-DE', {

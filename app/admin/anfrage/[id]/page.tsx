@@ -8,6 +8,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
 import type { AnalyseAnfrage } from '@/types'
 import StatusUpdate from '../../status-update'
+import ErgebnisUpload from '../../ergebnis-upload'
 import LogoutButton from '@/app/dashboard/logout-button'
 
 export default async function AnfrageDetailPage({
@@ -111,11 +112,16 @@ export default async function AnfrageDetailPage({
               </div>
             </div>
 
-            {/* Status & Notizen */}
-            <div className="lg:col-span-1">
+            {/* Status & Ergebnis */}
+            <div className="lg:col-span-1 space-y-6">
               <StatusUpdate
                 id={anfrage.id}
                 currentStatus={anfrage.status}
+              />
+              <ErgebnisUpload
+                id={anfrage.id}
+                ergebnis_filename={anfrage.ergebnis_filename}
+                ersparnis_euro={anfrage.ersparnis_euro}
               />
             </div>
           </div>

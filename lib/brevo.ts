@@ -198,3 +198,65 @@ export async function sendAdminBenachrichtigung(data: {
     attachment: attachment.length > 0 ? attachment : undefined,
   })
 }
+
+// E-Mail an Kunden mit Analyse-Ergebnis
+export async function sendErgebnisEmail(data: {
+  vorname: string
+  nachname: string
+  email: string
+  ersparnis_euro: string
+  ergebnis_filename: string
+  ergebnisBase64: string
+}) {
+  const ersparnis = parseFloat(data.ersparnis_euro).toLocaleString('de-DE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
+  const content = `
+    <h2 style="margin:0 0 8px;font-size:22px;color:#111827;">
+      Ihr Analyse-Ergebnis liegt vor!
+    </h2>
+    <p style="margin:0 0 24px;font-size:16px;color:#4b5563;">
+      Hallo ${data.vorname} ${data.nachname},
+    </p>
+    <p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6;">
+      Wir haben Ihre Energiekosten analysiert und freuen uns, Ihnen Ihr Ergebnis mitteilen zu k&ouml;nnen.
+    </p>
+
+    <div style="margin:0 0 24px;padding:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;text-align:center;">
+      <p style="margin:0 0 4px;font-size:14px;color:#15803d;font-weight:600;">
+        Ihre j&auml;hrliche Ersparnis
+      </p>
+      <p style="margin:0;font-size:32px;font-weight:700;color:#15803d;">
+        ${ersparnis} &euro; / Jahr
+      </p>
+    </div>
+
+    <p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6;">
+      Ihr detailliertes Analyse-Ergebnis finden Sie im Anhang dieser E-Mail.
+      Sie k&ouml;nnen es auch jederzeit in Ihrem pers&ouml;nlichen Dashboard einsehen:
+    </p>
+
+    <div style="margin:0 0 24px;text-align:center;">
+      <a href="https://energiepreise-sinken.de/dashboard"
+         style="display:inline-block;padding:12px 24px;background:#22a366;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">
+        Zum Dashboard
+      </a>
+    </div>
+
+    <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.6;">
+      Bei Fragen stehen wir Ihnen gerne zur Verf&uuml;gung unter
+      <a href="mailto:info@energiekosten-sinken.de" style="color:#22a366;">info@energiekosten-sinken.de</a>.
+    </p>`
+
+  return sendEmail({
+    to: [{ email: data.email, name: `${data.vorname} ${data.nachname}` }],
+    subject: `Ihr Analyse-Ergebnis: ${ersparnis} € Ersparnis pro Jahr`,
+    htmlContent: wrapInTemplate(content),
+    attachment: [{
+      content: data.ergebnisBase64,
+      name: data.ergebnis_filename,
+    }],
+  })
+}

@@ -80,6 +80,9 @@ export interface AnalyseAnfrage {
   marktlokations_id?: string | null
   abrechnung_path?: string | null
   abrechnung_filename?: string | null
+  ergebnis_path?: string | null
+  ergebnis_filename?: string | null
+  ersparnis_euro?: number | null
   status: 'neu' | 'in_bearbeitung' | 'abgeschlossen'
   created_at: string
   updated_at: string
