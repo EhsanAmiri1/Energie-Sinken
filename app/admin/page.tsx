@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   ClipboardList, Users, Clock, CheckCircle2,
-  AlertCircle, ArrowRight,
+  AlertCircle, ArrowRight, Zap, Flame,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
@@ -88,7 +88,7 @@ export default async function AdminPage() {
                       <tr>
                         <th className="px-6 py-3 font-medium text-gray-500">Name</th>
                         <th className="px-6 py-3 font-medium text-gray-500">E-Mail</th>
-                        <th className="px-6 py-3 font-medium text-gray-500 hidden sm:table-cell">Telefon</th>
+                        <th className="px-6 py-3 font-medium text-gray-500 hidden sm:table-cell">Typ</th>
                         <th className="px-6 py-3 font-medium text-gray-500 hidden md:table-cell">Verbrauch</th>
                         <th className="px-6 py-3 font-medium text-gray-500">Status</th>
                         <th className="px-6 py-3 font-medium text-gray-500 hidden lg:table-cell">Datum</th>
@@ -102,8 +102,20 @@ export default async function AdminPage() {
                             {a.vorname} {a.nachname}
                           </td>
                           <td className="px-6 py-4 text-gray-600">{a.email}</td>
-                          <td className="px-6 py-4 text-gray-600 hidden sm:table-cell">
-                            {a.telefon || '—'}
+                          <td className="px-6 py-4 hidden sm:table-cell">
+                            <div className="flex gap-1.5">
+                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                                a.energie_typ === 'gas'
+                                  ? 'bg-orange-50 border border-orange-200 text-orange-700'
+                                  : 'bg-amber-50 border border-amber-200 text-amber-700'
+                              }`}>
+                                {a.energie_typ === 'gas' ? <Flame className="h-3 w-3" /> : <Zap className="h-3 w-3" />}
+                                {a.energie_typ === 'gas' ? 'Gas' : 'Strom'}
+                              </span>
+                              <span className="inline-flex items-center rounded-full bg-gray-50 border border-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600">
+                                {a.kunden_typ === 'gewerbe' ? 'Gewerbe' : 'Privat'}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-6 py-4 text-gray-600 hidden md:table-cell">
                             {a.verbrauch_kwh ? `${Number(a.verbrauch_kwh).toLocaleString('de-DE')} kWh` : '—'}

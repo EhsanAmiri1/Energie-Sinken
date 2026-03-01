@@ -65,7 +65,7 @@ export interface Termin {
   created_at: string
 }
 
-// Analyse-Anfrage (ohne Login)
+// Analyse-Anfrage (mit oder ohne Login)
 export interface AnalyseAnfrage {
   id: string
   vorname: string
@@ -73,6 +73,8 @@ export interface AnalyseAnfrage {
   geburtsdatum?: string | null
   email: string
   telefon?: string | null
+  energie_typ: EnergieTyp
+  kunden_typ: KundenTyp
   zaehler_nummer?: string | null
   verbrauch_kwh?: number | null
   marktlokations_id?: string | null

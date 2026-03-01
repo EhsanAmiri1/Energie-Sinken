@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, User, Mail, Phone, Calendar,
-  Hash, Zap, MapPin, FileText, ClipboardList, Download,
+  Hash, Zap, MapPin, FileText, ClipboardList, Download, Flame, Building2,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { isAdmin } from '@/lib/admin'
@@ -34,6 +34,8 @@ export default async function AnfrageDetailPage({
     { icon: Calendar, label: 'Geburtsdatum', value: anfrage.geburtsdatum ? new Date(anfrage.geburtsdatum).toLocaleDateString('de-DE') : '—' },
     { icon: Mail, label: 'E-Mail', value: anfrage.email },
     { icon: Phone, label: 'Telefon', value: anfrage.telefon || '—' },
+    { icon: anfrage.energie_typ === 'gas' ? Flame : Zap, label: 'Energieart', value: anfrage.energie_typ === 'gas' ? 'Gas' : 'Strom' },
+    { icon: anfrage.kunden_typ === 'gewerbe' ? Building2 : User, label: 'Kundentyp', value: anfrage.kunden_typ === 'gewerbe' ? 'Gewerbe' : 'Privat' },
     { icon: Hash, label: 'Zählernummer', value: anfrage.zaehler_nummer || '—' },
     { icon: Zap, label: 'Verbrauch', value: anfrage.verbrauch_kwh ? `${Number(anfrage.verbrauch_kwh).toLocaleString('de-DE')} kWh` : '—' },
     { icon: MapPin, label: 'Marktlokations-ID', value: anfrage.marktlokations_id || '—' },

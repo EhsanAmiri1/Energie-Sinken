@@ -134,6 +134,8 @@ export async function sendAdminBenachrichtigung(data: {
   geburtsdatum?: string
   email: string
   telefon?: string
+  energie_typ?: string
+  kunden_typ?: string
   zaehler_nummer?: string
   verbrauch_kwh?: string
   marktlokations_id?: string
@@ -146,6 +148,8 @@ export async function sendAdminBenachrichtigung(data: {
     ['Geburtsdatum', data.geburtsdatum || '—'],
     ['E-Mail', data.email],
     ['Telefon', data.telefon || '—'],
+    ['Energieart', data.energie_typ === 'gas' ? 'Gas' : 'Strom'],
+    ['Kundentyp', data.kunden_typ === 'gewerbe' ? 'Gewerbe' : 'Privat'],
     ['Z&auml;hlernummer', data.zaehler_nummer || '—'],
     ['Verbrauch (kWh)', data.verbrauch_kwh || '—'],
     ['Marktlokations-ID', data.marktlokations_id || '—'],
