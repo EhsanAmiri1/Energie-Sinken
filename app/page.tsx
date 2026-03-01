@@ -40,7 +40,7 @@ function HeroSection() {
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
           <Link href="/analyse" className="btn-primary text-lg px-8 py-4">
-            Jetzt kostenlos analysieren
+            Jetzt kostenlos pr&uuml;fen
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
           <a href="#so-funktionierts" className="btn-secondary border-white/20 text-white hover:bg-white/10 text-lg px-8 py-4">
