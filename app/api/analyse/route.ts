@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendKundenBestaetigung, sendAdminBenachrichtigung } from '@/lib/brevo'
+import { sendKundenBestaetigung, sendRegistrierterBestaetigung, sendAdminBenachrichtigung } from '@/lib/brevo'
 
 // Supabase Admin Client (umgeht RLS)
 function getSupabaseAdmin() {
@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
     const energie_typ = (formData.get('energie_typ') as string) || 'strom'
     const kunden_typ = (formData.get('kunden_typ') as string) || 'privat'
     const abrechnung = formData.get('abrechnung') as File | null
+    const user_id = formData.get('user_id') as string | null
+    const anfrage_typ = (formData.get('anfrage_typ') as string) || 'gast'
 
     // Pflichtfelder validieren
     if (!vorname || !nachname || !email) {
@@ -60,6 +62,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Anfrage-Typ validieren
+    if (!['gast', 'registriert'].includes(anfrage_typ)) {
+      return NextResponse.json(
+        { error: 'Ungültiger Anfragetyp.' },
+        { status: 400 }
+      )
+    }
+
     const supabase = getSupabaseAdmin()
 
     // Datei hochladen (falls vorhanden)
@@ -68,15 +78,12 @@ export async function POST(request: NextRequest) {
     let abrechnungBase64: string | undefined
 
     if (abrechnung && abrechnung.size > 0) {
-      // Dateiname bereinigen und eindeutig machen
       const timestamp = Date.now()
       const safeFilename = abrechnung.name.replace(/[^a-zA-Z0-9._-]/g, '_')
       const storagePath = `${timestamp}_${safeFilename}`
 
-      // Datei in Buffer konvertieren
       const fileBuffer = Buffer.from(await abrechnung.arrayBuffer())
 
-      // In Supabase Storage hochladen
       const { error: uploadError } = await supabase.storage
         .from('analyse-abrechnungen')
         .upload(storagePath, fileBuffer, {
@@ -94,8 +101,6 @@ export async function POST(request: NextRequest) {
 
       abrechnung_path = storagePath
       abrechnung_filename = abrechnung.name
-
-      // Base64 für E-Mail-Anhang
       abrechnungBase64 = fileBuffer.toString('base64')
     }
 
@@ -115,6 +120,8 @@ export async function POST(request: NextRequest) {
         marktlokations_id: marktlokations_id || null,
         abrechnung_path,
         abrechnung_filename,
+        user_id: user_id || null,
+        anfrage_typ,
       })
 
     if (dbError) {
@@ -125,11 +132,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // E-Mails senden (parallel, Fehler nicht blockierend)
-    const emailPromises = [
-      sendKundenBestaetigung(nachname, email).catch((err) => {
-        console.error('Kunden-E-Mail Fehler:', err)
-      }),
+    // E-Mails senden
+    const emailPromises = []
+
+    // Kunden-E-Mail je nach Anfrage-Typ
+    if (anfrage_typ === 'registriert') {
+      emailPromises.push(
+        sendRegistrierterBestaetigung(vorname, nachname, email).catch((err) => {
+          console.error('Kunden-E-Mail Fehler:', err)
+        })
+      )
+    } else {
+      emailPromises.push(
+        sendKundenBestaetigung(nachname, email).catch((err) => {
+          console.error('Kunden-E-Mail Fehler:', err)
+        })
+      )
+    }
+
+    // Admin-E-Mail
+    emailPromises.push(
       sendAdminBenachrichtigung({
         vorname,
         nachname,
@@ -143,10 +165,11 @@ export async function POST(request: NextRequest) {
         marktlokations_id: marktlokations_id || undefined,
         abrechnung_filename: abrechnung_filename || undefined,
         abrechnungBase64,
+        anfrage_typ,
       }).catch((err) => {
         console.error('Admin-E-Mail Fehler:', err)
-      }),
-    ]
+      })
+    )
 
     await Promise.all(emailPromises)
 

@@ -12,12 +12,14 @@ export default function LeadsFilter({ anfragen }: { anfragen: AnalyseAnfrage[] }
   const [statusFilter, setStatusFilter] = useState('alle')
   const [typFilter, setTypFilter] = useState('alle')
   const [kundenFilter, setKundenFilter] = useState('alle')
+  const [anfrageTypFilter, setAnfrageTypFilter] = useState('alle')
 
   const gefiltert = useMemo(() => {
     return anfragen.filter((a) => {
       if (statusFilter !== 'alle' && a.status !== statusFilter) return false
       if (typFilter !== 'alle' && a.energie_typ !== typFilter) return false
       if (kundenFilter !== 'alle' && a.kunden_typ !== kundenFilter) return false
+      if (anfrageTypFilter !== 'alle' && a.anfrage_typ !== anfrageTypFilter) return false
       if (suchbegriff) {
         const s = suchbegriff.toLowerCase()
         const match =
@@ -29,14 +31,14 @@ export default function LeadsFilter({ anfragen }: { anfragen: AnalyseAnfrage[] }
       }
       return true
     })
-  }, [anfragen, suchbegriff, statusFilter, typFilter, kundenFilter])
+  }, [anfragen, suchbegriff, statusFilter, typFilter, kundenFilter, anfrageTypFilter])
 
   function exportCSV() {
-    const header = 'Vorname;Nachname;E-Mail;Telefon;Energietyp;Kundentyp;Verbrauch kWh;Status;Datum\n'
+    const header = 'Vorname;Nachname;E-Mail;Telefon;Energietyp;Kundentyp;Anfrage-Typ;Verbrauch kWh;Status;Datum\n'
     const rows = gefiltert.map((a) =>
       [
         a.vorname, a.nachname, a.email, a.telefon || '',
-        a.energie_typ, a.kunden_typ,
+        a.energie_typ, a.kunden_typ, a.anfrage_typ || 'gast',
         a.verbrauch_kwh || '', a.status,
         new Date(a.created_at).toLocaleDateString('de-DE'),
       ].join(';')
@@ -94,6 +96,15 @@ export default function LeadsFilter({ anfragen }: { anfragen: AnalyseAnfrage[] }
             <option value="privat">Privat</option>
             <option value="gewerbe">Gewerbe</option>
           </select>
+          <select
+            value={anfrageTypFilter}
+            onChange={(e) => setAnfrageTypFilter(e.target.value)}
+            className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-brand-500 focus:outline-none"
+          >
+            <option value="alle">Gast &amp; Registriert</option>
+            <option value="gast">Gast</option>
+            <option value="registriert">Registriert</option>
+          </select>
           <button
             onClick={exportCSV}
             className="inline-flex items-center gap-2 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
@@ -123,6 +134,7 @@ export default function LeadsFilter({ anfragen }: { anfragen: AnalyseAnfrage[] }
                   <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Telefon</th>
                   <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Typ</th>
                   <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Verbrauch</th>
+                  <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Anfrage</th>
                   <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Datum</th>
                   <th className="px-5 py-3"></th>
@@ -153,6 +165,15 @@ export default function LeadsFilter({ anfragen }: { anfragen: AnalyseAnfrage[] }
                     </td>
                     <td className="px-5 py-3 text-gray-400 hidden lg:table-cell">
                       {a.verbrauch_kwh ? `${Number(a.verbrauch_kwh).toLocaleString('de-DE')} kWh` : '—'}
+                    </td>
+                    <td className="px-5 py-3 hidden md:table-cell">
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        a.anfrage_typ === 'registriert'
+                          ? 'bg-brand-500/15 text-brand-400'
+                          : 'bg-gray-700/50 text-gray-400'
+                      }`}>
+                        {a.anfrage_typ === 'registriert' ? 'Registriert' : 'Gast'}
+                      </span>
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={a.status} />

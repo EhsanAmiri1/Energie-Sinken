@@ -127,6 +127,42 @@ export async function sendKundenBestaetigung(nachname: string, email: string) {
   })
 }
 
+// E-Mail an registrierten Kunden nach Analyse-Anfrage
+export async function sendRegistrierterBestaetigung(vorname: string, nachname: string, email: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://energiekosten-sinken.de'
+
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:22px;color:#111827;">
+      Willkommen, ${vorname} ${nachname}!
+    </h2>
+    <p style="margin:0 0 16px;font-size:16px;color:#4b5563;line-height:1.6;">
+      Vielen Dank f&uuml;r Ihre Analyse-Anfrage! Wir analysieren jetzt Ihre Energiekosten
+      und finden das beste Angebot f&uuml;r Sie.
+    </p>
+    <p style="margin:0 0 24px;font-size:16px;color:#4b5563;line-height:1.6;">
+      Verfolgen Sie den aktuellen Status jederzeit in Ihrem pers&ouml;nlichen Dashboard:
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 24px;">
+      <tr>
+        <td style="background-color:#22a366;border-radius:12px;">
+          <a href="${appUrl}/dashboard"
+             style="display:inline-block;padding:16px 32px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;">
+            Zum Dashboard &rarr;
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:0;font-size:14px;color:#9ca3af;">
+      Sie erhalten eine weitere E-Mail, sobald Ihr Analyse-Ergebnis vorliegt.
+    </p>`
+
+  return sendEmail({
+    to: [{ email, name: `${vorname} ${nachname}` }],
+    subject: 'Ihre Energiekosten-Analyse wurde gestartet',
+    htmlContent: wrapInTemplate(content),
+  })
+}
+
 // E-Mail an Admin mit allen Kundendaten
 export async function sendAdminBenachrichtigung(data: {
   vorname: string
@@ -141,8 +177,10 @@ export async function sendAdminBenachrichtigung(data: {
   marktlokations_id?: string
   abrechnung_filename?: string
   abrechnungBase64?: string
+  anfrage_typ?: string
 }) {
   const rows = [
+    ['Anfrage-Typ', data.anfrage_typ === 'registriert' ? '&#x2705; Registriert' : 'Gast'],
     ['Vorname', data.vorname],
     ['Nachname', data.nachname],
     ['Geburtsdatum', data.geburtsdatum || '—'],

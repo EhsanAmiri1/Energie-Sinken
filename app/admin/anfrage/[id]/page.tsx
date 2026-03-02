@@ -3,11 +3,13 @@ import Link from 'next/link'
 import {
   ArrowLeft, User, Mail, Phone, Calendar,
   Hash, Zap, MapPin, FileText, ClipboardList, Download, Flame, Building2,
+  Shield, UserPlus,
 } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import type { AnalyseAnfrage } from '@/types'
 import StatusUpdate from '../../status-update'
 import ErgebnisUpload from '../../ergebnis-upload'
+import InviteButton from '../../invite-button'
 
 export default async function AnfrageDetailPage({
   params,
@@ -25,6 +27,7 @@ export default async function AnfrageDetailPage({
   if (!anfrage) notFound()
 
   const rows = [
+    { icon: Shield, label: 'Anfrage-Typ', value: anfrage.anfrage_typ === 'registriert' ? 'Registriert' : 'Gast', badge: true, badgeColor: anfrage.anfrage_typ === 'registriert' ? 'bg-brand-500/15 text-brand-400' : 'bg-gray-700/50 text-gray-400' },
     { icon: User, label: 'Vorname', value: anfrage.vorname },
     { icon: User, label: 'Nachname', value: anfrage.nachname },
     { icon: Calendar, label: 'Geburtsdatum', value: anfrage.geburtsdatum ? new Date(anfrage.geburtsdatum).toLocaleDateString('de-DE') : '—' },
@@ -70,11 +73,17 @@ export default async function AnfrageDetailPage({
               Kundendaten
             </h2>
             <div className="mt-6 divide-y divide-gray-800/50">
-              {rows.map(({ icon: Icon, label, value }) => (
+              {rows.map(({ icon: Icon, label, value, badge, badgeColor }) => (
                 <div key={label} className="flex items-center gap-3 py-3">
                   <Icon className="h-4 w-4 shrink-0 text-gray-500" />
                   <span className="w-40 shrink-0 text-sm font-medium text-gray-400">{label}</span>
-                  <span className="text-sm text-gray-200">{value}</span>
+                  {badge ? (
+                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeColor}`}>
+                      {value}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-200">{value}</span>
+                  )}
                 </div>
               ))}
 
@@ -111,6 +120,9 @@ export default async function AnfrageDetailPage({
             ergebnis_filename={anfrage.ergebnis_filename}
             ersparnis_euro={anfrage.ersparnis_euro}
           />
+          {anfrage.anfrage_typ !== 'registriert' && !anfrage.user_id && (
+            <InviteButton id={anfrage.id} email={anfrage.email} />
+          )}
         </div>
       </div>
     </div>

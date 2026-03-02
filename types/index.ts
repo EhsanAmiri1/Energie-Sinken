@@ -7,6 +7,9 @@ export type KundenTyp = 'privat' | 'gewerbe'
 // Energieart: Strom oder Gas
 export type EnergieTyp = 'strom' | 'gas'
 
+// Anfrage-Typ: Gast (ohne Konto) oder Registriert (mit Konto)
+export type AnfrageTyp = 'gast' | 'registriert'
+
 // Lead-Status im CRM
 export type LeadStatus =
   | 'neu'           // Gerade angemeldet
@@ -65,7 +68,7 @@ export interface Termin {
   created_at: string
 }
 
-// Analyse-Anfrage (mit oder ohne Login)
+// Analyse-Anfrage (Gast oder Registriert)
 export interface AnalyseAnfrage {
   id: string
   vorname: string
@@ -83,6 +86,8 @@ export interface AnalyseAnfrage {
   ergebnis_path?: string | null
   ergebnis_filename?: string | null
   ersparnis_euro?: number | null
+  user_id?: string | null
+  anfrage_typ: AnfrageTyp
   status: 'neu' | 'in_bearbeitung' | 'angebot_geschickt' | 'abgeschlossen'
   created_at: string
   updated_at: string
