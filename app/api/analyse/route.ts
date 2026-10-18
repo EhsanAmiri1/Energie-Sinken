@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { sendKundenBestaetigung, sendRegistrierterBestaetigung, sendAdminBenachrichtigung } from '@/lib/brevo'
 
 // Supabase Admin Client (umgeht RLS)
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     const energie_typ = (formData.get('energie_typ') as string) || 'strom'
     const kunden_typ = (formData.get('kunden_typ') as string) || 'privat'
     const abrechnung = formData.get('abrechnung') as File | null
-    const user_id = formData.get('user_id') as string | null
+    const submittedUserId = formData.get('user_id')
     const anfrage_typ = (formData.get('anfrage_typ') as string) || 'gast'
 
     // Pflichtfelder validieren
@@ -70,6 +71,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Never trust ownership supplied by a browser, even for administrators.
+    // Guest submissions remain unowned; registered submissions require a verified session.
+    let user_id: string | null = null
+    if (submittedUserId !== null && typeof submittedUserId !== 'string') {
+      return NextResponse.json({ error: 'Ungültige Benutzer-ID.' }, { status: 400 })
+    }
+    if (anfrage_typ === 'gast') {
+      if (submittedUserId) {
+        return NextResponse.json({ error: 'Gast-Anfragen dürfen keine Benutzer-ID enthalten.' }, { status: 400 })
+      }
+    } else {
+      const authClient = createServerSupabaseClient()
+      const { data: { user }, error: authError } = await authClient.auth.getUser()
+      if (authError || !user || user.is_anonymous || !user.email_confirmed_at) {
+        return NextResponse.json({ error: 'Bitte melden Sie sich mit einem bestätigten Konto an.' }, { status: 401 })
+      }
+      if (submittedUserId && submittedUserId !== user.id) {
+        return NextResponse.json({ error: 'Die Benutzer-ID gehört nicht zum angemeldeten Konto.' }, { status: 403 })
+      }
+      user_id = user.id
+    }
+
+    // Privileged effects start only after ownership validation.
     const supabase = getSupabaseAdmin()
 
     // Datei hochladen (falls vorhanden)

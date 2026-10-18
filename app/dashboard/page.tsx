@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   const { data: anfragenData } = await supabase
     .from('analyse_anfragen')
     .select('*')
-    .eq('email', user.email!)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   const anfragen = (anfragenData as AnalyseAnfrage[]) || []
